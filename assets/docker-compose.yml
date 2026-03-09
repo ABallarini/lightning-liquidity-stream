@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  bitcoind:
+    image: lncm/bitcoind:v24.0
+    container_name: bitcoind-signet
+    restart: unless-stopped
+    volumes:
+      - ./bitcoin-data:/data
+    ports:
+      - "38333:38333"
+      - "38332:38332"
+    # Resource limits considering the VPS specs
+    deploy:
+      resources:
+        limits:
+          cpus: '0.80'      # Cap CPU at 80% to keep the VPS responsive
+          memory: 4G     # Cap RAM to prevent the OS from killing the process
+    # Bitcoind will automatically load /data/bitcoin.conf
+    command:
+      - "-chain=signet"
+      - "-datadir=/data"
+      - "-conf=/data/bitcoin.conf"
+      - "-rpcallowip=0.0.0.0/0"
+      - "-rpcbind=0.0.0.0"
+
+  lnd:
+    image: lightninglabs/lnd:v0.17.0-beta
+    container_name: lnd-signet
+    restart: unless-stopped
+    depends_on:
+      - bitcoind
+    volumes:
+      - ./lnd-data:/root/.lnd
+    ports:
+      - "10009:10009"
+      - "9735:9735"
+      - "8080:8080"
+    deploy:
+      # Resource limits considering the VPS specs
+      resources:
+        limits:
+          memory: 512M
+
+  lnd2:
+    image: lightninglabs/lnd:v0.17.0-beta
+    container_name: lnd2-signet
+    restart: unless-stopped
+    depends_on:
+      - bitcoind
+    volumes:
+      - ./lnd2-data:/root/.lnd
+    ports:
+      - "10010:10009" # gRPC changed to 10010
+      - "9736:9735" # P2P changed to 9736
+      - "8081:8080" # REST changed to 8081
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+

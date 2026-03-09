@@ -1,0 +1,25 @@
+# Compiled output
+/dist
+/node_modules
+
+# Environment variables
+.env
+
+# Logs
+payment-logs.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# LND Credentials (Sensitive)
+*.cert
+*.macaroon
+
+# Editor folders and OS files
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Generated files
+payment-logs.json
